@@ -1,4 +1,4 @@
-package com.bookit.stepDefinitions;
+package com.bookit.step_definitions;
 
 public class LoginStepDefinition {
 }
