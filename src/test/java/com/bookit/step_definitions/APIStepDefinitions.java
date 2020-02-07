@@ -1,5 +1,6 @@
 package com.bookit.step_definitions;
 
+import com.bookit.pojos.Room;
 import com.bookit.utilities.APIUtilities;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -9,6 +10,8 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.Assert;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +74,51 @@ public class APIStepDefinitions {
             response.then().log().body(true);
         }
     }
+
+    @Then("user should be able to see all room names")
+    public void user_should_be_able_to_see_all_room_names() {
+       List<Room> rooms=response.jsonPath().getList("",Room.class);
+       for (Room room : rooms) {
+           System.out.println(room.getName());
+       }
+
+        System.out.println("======================");
+
+       List<Room> rooms2=new ArrayList<>(rooms);
+       Collections.sort(rooms2);
+
+       //Printing in ascending order...
+       for (Room room : rooms2){
+           System.out.println(room.getName());
+       }
+    }
+
+    @Then("user payload contains following room names:")
+    public void user_payload_contains_following_room_names(List<String> expectedRooms) {
+        List<String> actualRooms = response.jsonPath().getList("name");
+        Assert.assertEquals(expectedRooms, actualRooms);
+    }
+
+    @When("user sends DELETE request to {string} to exclude student")
+    public void user_sends_DELETE_request_to_to_exclude_student(String id) {
+       response =
+               given()
+               .accept(contentType).auth().oauth2(token)
+               .when()
+               .delete(id).prettyPeek();
+
+    }
+
+    @When("user verifies that status line contains {string}")
+    public void user_verifies_that_status_line_contains(String message) {
+        Assert.assertTrue(response.statusLine().contains(message));
+    }
+
+    @When("user verifies that payload contains {string} message")
+    public void user_verifies_that_payload_contains_message(String string) {
+     response.body().toString().contains(string);
+    }
+
 
 }
 
